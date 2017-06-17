@@ -22,13 +22,17 @@ extension UIViewController {
         NotificationCenter.default.removeObserver(self, name: .UIKeyboardWillHide, object: nil)
     }
     
+    func resetView() {
+        view.frame.origin.y = 0
+    }
+    
     func keyboardWillShow(_ notification:Notification) {
-        
-        view.frame.origin.y -= getKeyboardHeight(notification)
+        resetView()
+        view.frame.origin.y -= getKeyboardHeight(notification) // adjust the view based on keyboard
     }
     
     func keyboardWillHide(_ notification:Notification) {
-        view.frame.origin.y = 0
+        resetView()
     }
     
     func getKeyboardHeight(_ notification:Notification) -> CGFloat {
