@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-extension UIViewController {
+extension MemeEditorViewController {
     func subscribeToKeyboardNotifications() {
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: .UIKeyboardWillShow, object: nil)
@@ -28,7 +28,9 @@ extension UIViewController {
     
     func keyboardWillShow(_ notification:Notification) {
         resetView()
-        view.frame.origin.y -= getKeyboardHeight(notification) // adjust the view based on keyboard
+        if bottomTextfield.isFirstResponder {
+            view.frame.origin.y -= getKeyboardHeight(notification) // adjust the view based on keyboard
+        }
     }
     
     func keyboardWillHide(_ notification:Notification) {

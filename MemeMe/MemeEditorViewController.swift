@@ -32,22 +32,21 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
     // This value is changed whenever the user chooses a font from the picker
     var fontName = "impact"
     
-    struct Meme {
-        var topText: String!
-        var bottomText: String!
-        var originalImage: UIImage!
-        var memedImage: UIImage!
-        
-        init(topText: String! = "", bottomText: String! = "", originalImage: UIImage, memedImage: UIImage) {
-            self.topText = topText
-            self.bottomText = bottomText
-            self.originalImage = originalImage
-            self.memedImage = memedImage
-        }
-    }
-    
     func currentFont() -> UIFont {
         return UIFont(name: fontName, size: 40)!
+    }
+    
+    func configure(textField: UITextField) {
+        let memeTextAttributes:[String:Any] = [
+            NSStrokeColorAttributeName: UIColor.black,
+            NSForegroundColorAttributeName: UIColor.white,
+            NSFontAttributeName: currentFont(),
+            NSStrokeWidthAttributeName: -3.0]
+        
+        textField.defaultTextAttributes = memeTextAttributes
+        textField.textAlignment = .center
+        textField.delegate = self
+        
     }
     
     override func viewDidLoad() {
@@ -57,20 +56,8 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
         cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
         
         // Set up textfields
-        let memeTextAttributes:[String:Any] = [
-            NSStrokeColorAttributeName: UIColor.black,
-            NSForegroundColorAttributeName: UIColor.white,
-            NSFontAttributeName: currentFont(),
-            NSStrokeWidthAttributeName: -3.0]
-        
-        topTextfield.defaultTextAttributes = memeTextAttributes
-        bottomTextfield.defaultTextAttributes = memeTextAttributes
-        
-        topTextfield.textAlignment = .center
-        bottomTextfield.textAlignment = .center
-        
-        topTextfield.delegate = self
-        bottomTextfield.delegate = self
+        configure(textField: topTextfield)
+        configure(textField: bottomTextfield)
     
     }
     
