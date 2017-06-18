@@ -32,6 +32,8 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
     // This value is changed whenever the user chooses a font from the picker
     var fontName = "impact"
     
+    // MARK: - Setup Functions
+    
     func currentFont() -> UIFont {
         return UIFont(name: fontName, size: 40)!
     }
@@ -48,6 +50,8 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
         textField.delegate = self
         
     }
+    
+    // MARK: - Overrides
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -71,6 +75,8 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
         unsubscribeFromKeyboardNotifications()
     }
     
+    // MARK: - Main Functions
+    
     func setToolbarVisibility(hidden: Bool) {
         topToolbar.isHidden = hidden
         bottomToolbar.isHidden = hidden
@@ -89,13 +95,17 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
         if let error = error {
             // There was an error
             print(error.localizedDescription)
-            showAlert(title: "Error Saving Meme!", message: "Oh no! We had some trouble saving your meme")
+            showAlert(title: "Error Saving Meme!", message: "Oh no! We had some trouble saving your meme to photos")
         }
     }
     
     func save() {
         // Create the meme
         let meme = Meme(topText: topTextfield.text!, bottomText: bottomTextfield.text!, originalImage: memeImageView.image!, memedImage: memedImage)
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.memes.append(meme)
+        
         UIImageWriteToSavedPhotosAlbum(meme.memedImage, self, #selector(meme(_:didFinishSavingWithError:contextInfo:)), nil)
     }
     
@@ -164,6 +174,8 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
         present(alertController, animated: true, completion: nil)
     }
     
+    // MARK: - IBActions
+    
     @IBAction func pickAnImage(_ sender: UIBarButtonItem) {
         
         let source:  UIImagePickerControllerSourceType = sender.tag == 0 ? .camera:.photoLibrary
@@ -199,19 +211,28 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
         }
         
         let activityContoller = UIActivityViewController(activityItems: [memedImage], applicationActivities: nil)
-        self.present(activityContoller, animated: true, completion: save)
+        self.present(activityContoller, animated: true, completion: nil)
+        
+        activityContoller.completionWithItemsHandler = {(activityType, completed, items, error) in
+            
+            if let error = error {
+                print(error.localizedDescription)
+                self.showAlert(title: "Error sharing", message: "Could not present options for you to share your meme :(")
+            } else {
+                if completed {
+                    self.save()
+                }
+            }
+            
+        }
     }
     
     @IBAction func cancel() {
-        fontName = "impact"
-        topTextfield.font = currentFont()
-        bottomTextfield.font = currentFont()
-        
-        topTextfield.text = "TOP"
-        bottomTextfield.text = "BOTTOM"
-        memeImageView.image = nil
+        dismiss(animated: true, completion: nil)
     }
 }
+
+// MARK: - ImagePickerControllerDelegate
 
 extension MemeEditorViewController: UIImagePickerControllerDelegate{
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
@@ -222,6 +243,8 @@ extension MemeEditorViewController: UIImagePickerControllerDelegate{
         dismiss(animated: true, completion: nil)
     }
 }
+
+// MARK: - TextFieldDelegate
 
 extension MemeEditorViewController: UITextFieldDelegate {
     
@@ -254,6 +277,8 @@ extension MemeEditorViewController: UITextFieldDelegate {
         return true
     }
 }
+
+// MARK: - PickerView Delegate + DataSource
 
 extension MemeEditorViewController: UIPickerViewDelegate, UIPickerViewDataSource { // For the font picker
     
