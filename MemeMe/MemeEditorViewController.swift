@@ -103,9 +103,6 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
             // There was an error
             print(error.localizedDescription)
             showAlert(title: "Error Saving Meme!", message: "Oh no! We had some trouble saving your meme")
-        } else {
-            print("Meme saved")
-            showAlert(title: "Meme Saved!", message: "We saved your meme to your photos :)")
         }
     }
     
