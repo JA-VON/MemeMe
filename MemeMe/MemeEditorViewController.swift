@@ -25,6 +25,13 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
     
     var memedImage: UIImage!
     
+    // These variables keep track of the textfield at edit time, helps to avoid the textfield texts overlapping while the user is editting
+    var topTextfieldValue = ""
+    var bottomTextfieldValue = ""
+    
+    // This value is changed whenever the user chooses a font from the picker
+    var fontName = "impact"
+    
     struct Meme {
         var topText: String!
         var bottomText: String!
@@ -39,6 +46,10 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
         }
     }
     
+    func currentFont() -> UIFont {
+        return UIFont(name: fontName, size: 40)!
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -49,7 +60,7 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
         let memeTextAttributes:[String:Any] = [
             NSStrokeColorAttributeName: UIColor.black,
             NSForegroundColorAttributeName: UIColor.white,
-            NSFontAttributeName: UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!,
+            NSFontAttributeName: currentFont(),
             NSStrokeWidthAttributeName: -3.0]
         
         topTextfield.defaultTextAttributes = memeTextAttributes
@@ -85,9 +96,23 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
         self.present(alertController, animated: true, completion: nil)
     }
     
+    // Note to self: UnsafeRawPointer type provides no automated memory management, no type safety, and no alignment guarantees.
+    // i.e. garbage clean that myself to avoid memory leaks
+    func meme(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+        if let error = error {
+            // There was an error
+            print(error.localizedDescription)
+            showAlert(title: "Error Saving Meme!", message: "Oh no! We had some trouble saving your meme")
+        } else {
+            print("Meme saved")
+            showAlert(title: "Meme Saved!", message: "We saved your meme to your photos :)")
+        }
+    }
+    
     func save() {
         // Create the meme
         let meme = Meme(topText: topTextfield.text!, bottomText: bottomTextfield.text!, originalImage: memeImageView.image!, memedImage: memedImage)
+        UIImageWriteToSavedPhotosAlbum(meme.memedImage, self, #selector(meme(_:didFinishSavingWithError:contextInfo:)), nil)
     }
     
     func renderViewToImage() -> UIImage {
@@ -114,11 +139,44 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
         let allowAction = UIAlertAction(title: "Allow access to the \(type)", style: .cancel, handler: { alert in
-            UIApplication.shared.open(URL(string: UIApplicationOpenSettingsURLString)!, options: [:], completionHandler: nil)
+            UIApplication.shared.open(URL(string: UIApplicationOpenSettingsURLString)!, options: [:], completionHandler: nil) // Take the user to settings and hope they grant access
         })
         
         alertController.addAction(allowAction)
         alertController.addAction(cancelAction)
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    func askUserForFont(textField: UITextField) {
+        
+        // Create a view controller to ask the user for the font they would like to use
+        let fontViewController = UIViewController()
+        fontViewController.preferredContentSize = CGSize(width: self.view.frame.width, height: 200)
+        
+        
+        // Set up picker for fonts
+        let pickerFrame: CGRect = CGRect(x: 0, y: 0, width: self.view.frame.width, height: 200) // Note: left, right, width, height
+        let picker: UIPickerView = UIPickerView(frame: pickerFrame);
+        
+        picker.delegate = self;
+        picker.dataSource = self;
+    
+        fontViewController.view.addSubview(picker)
+        
+        let alertController = UIAlertController(title: "Choose your font!", message: "Choose a font you like :)", preferredStyle: .actionSheet);
+        alertController.isModalInPopover = true
+        
+        alertController.setValue(fontViewController, forKey: "contentViewController")
+        
+        let cancelAction = UIAlertAction(title: "Use Current Font", style: .default, handler: nil)
+        let OKAction = UIAlertAction(title: "OK", style: .default, handler: { alert in
+            self.fontName = UIFont.familyNames[picker.selectedRow(inComponent: 0)] // There's only one component :)
+            textField.font = self.currentFont()
+        })
+        
+        alertController.addAction(cancelAction)
+        alertController.addAction(OKAction)
+        
         present(alertController, animated: true, completion: nil)
     }
     
@@ -144,6 +202,7 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
         let imagePicker = UIImagePickerController()
         imagePicker.delegate = self
         imagePicker.sourceType = source
+        imagePicker.allowsEditing = true // Allow the user to crop
         present(imagePicker, animated: true, completion: nil)
     }
     
@@ -160,8 +219,12 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
     }
     
     @IBAction func cancel() {
+        fontName = "impact"
+        topTextfield.font = currentFont()
+        bottomTextfield.font = currentFont()
+        
         topTextfield.text = "TOP"
-        bottomTextfield.text = "TOP"
+        bottomTextfield.text = "BOTTOM"
         memeImageView.image = nil
     }
 }
@@ -177,9 +240,48 @@ extension MemeEditorViewController: UIImagePickerControllerDelegate{
 }
 
 extension MemeEditorViewController: UITextFieldDelegate {
+    
+    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        self.fontName = (textField.font?.familyName)!
+        askUserForFont(textField: textField)
+        
+        topTextfieldValue = topTextfield.text!
+        bottomTextfieldValue = bottomTextfield.text!
+        
+        topTextfield.text = ""
+        bottomTextfield.text = ""
+        return true
+    }
+
+    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+        if topTextfield.text == "" {
+            topTextfield.text = topTextfieldValue
+        }
+        
+        if bottomTextfield.text == "" {
+            bottomTextfield.text = bottomTextfieldValue
+        }
+        return true
+    }
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         resetView()
         return true
+    }
+}
+
+extension MemeEditorViewController: UIPickerViewDelegate, UIPickerViewDataSource { // For the font picker
+    
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return UIFont.familyNames.count // Thanks Apple
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return UIFont.familyNames[row]
     }
 }

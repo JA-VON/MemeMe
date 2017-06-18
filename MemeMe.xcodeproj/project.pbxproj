@@ -11,6 +11,7 @@
 		8A66E3671EF4D3A500ABD1B6 /* UIViewController+KeyboardUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A66E3641EF4D3A500ABD1B6 /* UIViewController+KeyboardUtils.swift */; };
 		8A66E3681EF4D3A500ABD1B6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A66E3651EF4D3A500ABD1B6 /* AppDelegate.swift */; };
 		8A66E36A1EF4D3BA00ABD1B6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A66E3691EF4D3BA00ABD1B6 /* Assets.xcassets */; };
+		8A66E36E1EF6360700ABD1B6 /* impact.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8A66E36D1EF6360700ABD1B6 /* impact.ttf */; };
 		8A942E751EF467C7009CBF3A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8A942E731EF467C7009CBF3A /* Main.storyboard */; };
 		8A942E7A1EF467C7009CBF3A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8A942E781EF467C7009CBF3A /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
@@ -21,6 +22,7 @@
 		8A66E3651EF4D3A500ABD1B6 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8A66E3691EF4D3BA00ABD1B6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8A66E36B1EF4D3C500ABD1B6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8A66E36D1EF6360700ABD1B6 /* impact.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = impact.ttf; sourceTree = "<group>"; };
 		8A942E6C1EF467C7009CBF3A /* MemeMe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MemeMe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A942E741EF467C7009CBF3A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		8A942E791EF467C7009CBF3A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -58,6 +60,7 @@
 			children = (
 				8A66E3631EF4D3A500ABD1B6 /* MemeEditorViewController.swift */,
 				8A66E3641EF4D3A500ABD1B6 /* UIViewController+KeyboardUtils.swift */,
+				8A66E36D1EF6360700ABD1B6 /* impact.ttf */,
 				8A66E3691EF4D3BA00ABD1B6 /* Assets.xcassets */,
 				8A942E731EF467C7009CBF3A /* Main.storyboard */,
 				8A942E781EF467C7009CBF3A /* LaunchScreen.storyboard */,
@@ -131,6 +134,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8A66E36E1EF6360700ABD1B6 /* impact.ttf in Resources */,
 				8A942E7A1EF467C7009CBF3A /* LaunchScreen.storyboard in Resources */,
 				8A66E36A1EF4D3BA00ABD1B6 /* Assets.xcassets in Resources */,
 				8A942E751EF467C7009CBF3A /* Main.storyboard in Resources */,
