@@ -95,22 +95,28 @@ class SentMemesTableViewController: UITableViewController {
             confirmDelete(indexPath: indexPath)
         }
     }
- 
 
-    /*
+    
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
+        let memeToMove = memes[fromIndexPath.row]
+        memes.remove(at: fromIndexPath.row)
+        memes.insert(memeToMove, at: to.row)
+        
+        // sync up with app delegate
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.memes = memes
     }
-    */
-
-    /*
+    
     // Override to support conditional rearranging of the table view.
     override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
         return true
     }
-    */
+ 
+    // MARK: - IBActions
 
+    @IBAction func startReordering(_ sender: Any) {
+        self.isEditing = !self.isEditing // Click the button to both start and stop reordering the memes in the table
+    }
 
 }

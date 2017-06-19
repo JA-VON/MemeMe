@@ -34,6 +34,7 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
     var changingFont = false
     
     var memeIndex: Int?
+    lazy var isEditingMeme: Bool = { self.memeIndex != nil }() // Note: lazy - initialised when first accessed
     
     var isMemeSaved = false
     
@@ -120,14 +121,21 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
         }
     }
     
+    func returnToPreviousController() {
+        if isEditingMeme {
+            self.navigationController?.popViewController(animated: true)
+        } else {
+            dismiss(animated: true, completion: nil)
+        }
+    }
+    
     func save() {
         // Create the meme
         let meme = Meme(topText: topTextfield.text!, bottomText: bottomTextfield.text!, originalImage: memeImageView.image!, memedImage: memedImage)
         
-        let isEditing = memeIndex != nil
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
-        if isEditing { // If we are editing an already exisiting meme
+        if isEditingMeme { // If we are editing an already exisiting meme
             appDelegate.memes[memeIndex!] = meme // safe to unwrap
         } else {
             appDelegate.memes.append(meme)
@@ -162,11 +170,11 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
         let alertController = UIAlertController(title: "Do you want to save your meme?", message: "Press OK to save your meme, otherwise your awesome meme will be lost forever!", preferredStyle: .alert)
         
         let noThanksAction = UIAlertAction(title: "No Thanks!", style: .destructive, handler: { alert in
-            self.dismiss(animated: true, completion: nil)
+            self.returnToPreviousController()
         })
         let okAction = UIAlertAction(title: "OK", style: .default, handler: { alert in
             self.save()
-            self.dismiss(animated: true, completion: nil)
+            self.returnToPreviousController()
         })
         
         alertController.addAction(noThanksAction)
@@ -251,12 +259,13 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
     }
     
     @IBAction func shareMeme() {
-        memedImage = generateMemedImage()
         
         guard memeImageView.image != nil else {
             showAlert(title: "No Meme detected", message: "Sorry there was a problem making your meme.")
             return
         }
+        
+        memedImage = generateMemedImage()
         
         let activityContoller = UIActivityViewController(activityItems: [memedImage], applicationActivities: nil)
         self.present(activityContoller, animated: true, completion: nil)
@@ -276,9 +285,14 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
     }
     
     @IBAction func cancel() {
-        if !isMemeSaved {
-            askUserToSave()
+        
+        guard memeImageView.image != nil && !isMemeSaved else { // Dismiss if there is an image and the meme is already saved
+            returnToPreviousController()
+            return
         }
+        
+        memedImage = generateMemedImage()
+        askUserToSave()
     }
 }
 

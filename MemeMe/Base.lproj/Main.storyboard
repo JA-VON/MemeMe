@@ -61,6 +61,11 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Sent Memes" id="clc-wd-wcl">
+                        <barButtonItem key="leftBarButtonItem" systemItem="edit" id="Qj2-eY-P0Y">
+                            <connections>
+                                <action selector="startReordering:" destination="1gH-g8-Zlj" id="Ib8-dQ-Uca"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="e17-nI-z7G">
                             <connections>
                                 <segue destination="BYZ-38-t0r" kind="presentation" id="hEa-Xc-lIK"/>
@@ -142,7 +147,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="PGv-37-3z5" userLabel="Meme ImageVIew">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="PGv-37-3z5" userLabel="Meme ImageVIew">
                                 <rect key="frame" x="0.0" y="20" width="375" height="647"/>
                             </imageView>
                         </subviews>
