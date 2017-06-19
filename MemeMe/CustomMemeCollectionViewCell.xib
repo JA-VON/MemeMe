@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="impact.ttf">
+            <string>Impact</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="SentMemeCollectionViewCell" id="gTV-IL-0wX" customClass="CustomMemeCollectionViewCell" customModule="MemeMe" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="200" height="200"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="200" height="200"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="0W9-rJ-wgw">
+                        <rect key="frame" x="0.0" y="0.0" width="200" height="200"/>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="TOP" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="miR-Xg-4lv">
+                        <rect key="frame" x="0.0" y="8" width="200" height="29.5"/>
+                        <fontDescription key="fontDescription" name="Impact" family="Impact" pointSize="24"/>
+                        <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="BOTTOM" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Abb-1C-LOJ">
+                        <rect key="frame" x="0.0" y="162.5" width="200" height="29.5"/>
+                        <fontDescription key="fontDescription" name="Impact" family="Impact" pointSize="24"/>
+                        <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+            </view>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="0W9-rJ-wgw" secondAttribute="bottom" id="3bY-0q-tec"/>
+                <constraint firstItem="Abb-1C-LOJ" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="4ee-Wg-xCz"/>
+                <constraint firstAttribute="bottom" secondItem="Abb-1C-LOJ" secondAttribute="bottom" constant="8" id="FRl-Zu-zHQ"/>
+                <constraint firstItem="miR-Xg-4lv" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" constant="8" id="Hs9-0D-w4D"/>
+                <constraint firstItem="miR-Xg-4lv" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="Lvh-rK-nHB"/>
+                <constraint firstAttribute="trailing" secondItem="0W9-rJ-wgw" secondAttribute="trailing" id="QtY-0G-bkD"/>
+                <constraint firstItem="0W9-rJ-wgw" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="XvA-CX-9fD"/>
+                <constraint firstItem="0W9-rJ-wgw" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="YQc-u8-L0V"/>
+                <constraint firstAttribute="trailing" secondItem="miR-Xg-4lv" secondAttribute="trailing" id="j59-Ui-aBJ"/>
+                <constraint firstAttribute="trailing" secondItem="Abb-1C-LOJ" secondAttribute="trailing" id="rAP-M1-Awf"/>
+            </constraints>
+            <size key="customSize" width="200" height="200"/>
+            <connections>
+                <outlet property="bottomLabel" destination="Abb-1C-LOJ" id="hzG-uy-7fv"/>
+                <outlet property="memeOriginalImageView" destination="0W9-rJ-wgw" id="no4-mY-qbU"/>
+                <outlet property="topLabel" destination="miR-Xg-4lv" id="pyT-bH-9Wf"/>
+            </connections>
+            <point key="canvasLocation" x="28" y="13"/>
+        </collectionViewCell>
+    </objects>
+</document>

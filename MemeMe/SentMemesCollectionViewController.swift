@@ -27,7 +27,8 @@ class SentMemesCollectionViewController: UICollectionViewController {
         flowLayout.itemSize = CGSize(width: dimension, height: dimension)
         
         // Register cell classes
-//        self.collectionView!.register(SentMemeCollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier) // Don't use this if using UIElements from storyboard
+        self.collectionView?.register(UINib(nibName: "CustomMemeCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: reuseIdentifier)
+//        self.collectionView!.register(CustomMemeCollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier) // Don't use this if using UIElements from storyboard
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -50,11 +51,16 @@ class SentMemesCollectionViewController: UICollectionViewController {
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! SentMemeCollectionViewCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! CustomMemeCollectionViewCell
+        
+        // first attempt at custom nib
+//        let cell = Bundle.main.loadNibNamed("CustomMemeCollectionViewCell", owner: self, options: nil)?.first as! CustomMemeCollectionViewCell // first attribute needed to grab that view inside the xib
         
         let meme = memes[indexPath.row]
         
-        cell.memeImageView.image = meme.memedImage
+        cell.topLabel.text = meme.topText
+        cell.bottomLabel.text = meme.bottomText
+        cell.memeOriginalImageView.image = meme.originalImage
         
         return cell
     }
