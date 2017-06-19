@@ -31,6 +31,11 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
     
     // This value is changed whenever the user chooses a font from the picker
     var fontName = "impact"
+    var changingFont = false
+    
+    var memeIndex: Int?
+    
+    var isMemeSaved = false
     
     // MARK: - Setup Functions
     
@@ -51,6 +56,19 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
         
     }
     
+    func setupMemeIfEditing() {
+        if let memeIndex = memeIndex {
+            isMemeSaved = true // Wait for an edit to happen before asking user to save on cancel pressed 
+            
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let meme = appDelegate.memes[memeIndex]
+            
+            topTextfield.text = meme.topText!
+            bottomTextfield.text = meme.bottomText!
+            memeImageView.image = meme.originalImage
+        }
+    }
+    
     // MARK: - Overrides
     
     override func viewDidLoad() {
@@ -62,6 +80,9 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
         // Set up textfields
         configure(textField: topTextfield)
         configure(textField: bottomTextfield)
+        
+        // Preload meme data if editing a meme
+        setupMemeIfEditing()
     
     }
     
@@ -95,7 +116,7 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
         if let error = error {
             // There was an error
             print(error.localizedDescription)
-            showAlert(title: "Error Saving Meme!", message: "Oh no! We had some trouble saving your meme to photos")
+            showAlert(title: "Error Saving Meme!", message: "Oh no! We had some trouble saving your meme to photos, but we still have it here in app. Try editing and saving again :)")
         }
     }
     
@@ -103,10 +124,18 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
         // Create the meme
         let meme = Meme(topText: topTextfield.text!, bottomText: bottomTextfield.text!, originalImage: memeImageView.image!, memedImage: memedImage)
         
+        let isEditing = memeIndex != nil
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.memes.append(meme)
+        
+        if isEditing { // If we are editing an already exisiting meme
+            appDelegate.memes[memeIndex!] = meme // safe to unwrap
+        } else {
+            appDelegate.memes.append(meme)
+        }
         
         UIImageWriteToSavedPhotosAlbum(meme.memedImage, self, #selector(meme(_:didFinishSavingWithError:contextInfo:)), nil)
+        
+        isMemeSaved = true // Doesn't necessarily mean saved to photo album
     }
     
     func renderViewToImage() -> UIImage {
@@ -125,7 +154,25 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
         let memedImage = renderViewToImage()
         setToolbarVisibility(hidden: false)
         
+        isMemeSaved = false // New meme
         return memedImage
+    }
+    
+    func askUserToSave() {
+        let alertController = UIAlertController(title: "Do you want to save your meme?", message: "Press OK to save your meme, otherwise your awesome meme will be lost forever!", preferredStyle: .alert)
+        
+        let noThanksAction = UIAlertAction(title: "No Thanks!", style: .destructive, handler: { alert in
+            self.dismiss(animated: true, completion: nil)
+        })
+        let okAction = UIAlertAction(title: "OK", style: .default, handler: { alert in
+            self.save()
+            self.dismiss(animated: true, completion: nil)
+        })
+        
+        alertController.addAction(noThanksAction)
+        alertController.addAction(okAction)
+        
+        present(alertController, animated: true, completion: nil)
     }
     
     func askNicelyForAccess(type: String) {
@@ -142,6 +189,7 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
     }
     
     func askUserForFont(textField: UITextField) {
+        self.fontName = (textField.font?.familyName)! // Current Font
         
         // Create a view controller to ask the user for the font they would like to use
         let fontViewController = UIViewController()
@@ -157,7 +205,7 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
     
         fontViewController.view.addSubview(picker)
         
-        let alertController = UIAlertController(title: "Choose your font!", message: "Choose a font you like :)", preferredStyle: .actionSheet);
+        let alertController = UIAlertController(title: "Choose a font!", message: "Choose a font you like to use for the last text you entered :)", preferredStyle: .actionSheet);
         alertController.isModalInPopover = true
         
         alertController.setValue(fontViewController, forKey: "contentViewController")
@@ -228,7 +276,9 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
     }
     
     @IBAction func cancel() {
-        dismiss(animated: true, completion: nil)
+        if !isMemeSaved {
+            askUserToSave()
+        }
     }
 }
 
@@ -237,7 +287,7 @@ class MemeEditorViewController: UIViewController, UINavigationControllerDelegate
 extension MemeEditorViewController: UIImagePickerControllerDelegate{
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         print("ImagePicker finished")
-        if let image = info[UIImagePickerControllerOriginalImage] as? UIImage { // Get image if it exists
+        if let image = info[UIImagePickerControllerEditedImage] as? UIImage { // Get image if it exists
             self.memeImageView.image = image
         }
         dismiss(animated: true, completion: nil)
@@ -247,27 +297,49 @@ extension MemeEditorViewController: UIImagePickerControllerDelegate{
 // MARK: - TextFieldDelegate
 
 extension MemeEditorViewController: UITextFieldDelegate {
+
+    func clear(textField: UITextField) {
+        textField.text = ""
+    }
     
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-        self.fontName = (textField.font?.familyName)!
-        askUserForFont(textField: textField)
+        
+        guard !changingFont else {
+            changingFont = false
+            return false
+        }
         
         topTextfieldValue = topTextfield.text!
         bottomTextfieldValue = bottomTextfield.text!
         
-        topTextfield.text = ""
-        bottomTextfield.text = ""
+        clear(textField: topTextfield)
+        clear(textField: bottomTextfield)
         return true
     }
 
     func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
-        if topTextfield.text == "" {
+        
+        isMemeSaved = false // text has been changed
+        
+        var shouldAskForFont = false
+        
+        if (topTextfield.text?.isEmpty)! {
             topTextfield.text = topTextfieldValue
+        } else {
+            shouldAskForFont = true
         }
         
-        if bottomTextfield.text == "" {
+        if (bottomTextfield.text?.isEmpty)! {
             bottomTextfield.text = bottomTextfieldValue
+        } else {
+            shouldAskForFont = true
         }
+        
+        if shouldAskForFont {
+            askUserForFont(textField: textField)
+            changingFont = true
+        }
+        
         return true
     }
     
